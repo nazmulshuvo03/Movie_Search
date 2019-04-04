@@ -1,9 +1,17 @@
 .titleBar {
-	background-color: black;
-	color: white;
+	background-color: #000;
+	color: #fff;
 	display: block;
 	padding-left: 16px;
 }
+
+.search {
+	font-size: 24px;
+	display: block;
+	width: 100%;
+	padding: 4px 16px;
+}
+
 .App {
 	text-align: center;
 }
