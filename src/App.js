@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import $ from 'jquery';
 
 import './App.css';
 import MovieRow from './MovieRow';
@@ -7,32 +8,42 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 
-		const movies = [
-			{
-				id: 0,
-				title: 'Avengers: EndGame',
-				poster_src: 'https://image.tmdb.org/t/p/w185_and_h278_bestv2/dHjLaIUHXcMBt7YxK1TKWK1end9.jpg',
-				overview:
-					'After the devastating events of Avengers: Infinity War, the universe is in ruins due to the efforts of the Mad Titan'
+		this.state = {};
+
+		this.performSearch('iron');
+	}
+
+	performSearch(searchTerm) {
+		const urlString =
+			'https://api.themoviedb.org/3/search/movie?api_key=65f79409283878f174a96aea0dc77a36&query=' + searchTerm;
+		$.ajax({
+			url: urlString,
+			success: (searchResults) => {
+				//console.log('Fetched Data Successfully');
+				const results = searchResults.results;
+				const movieRows = [];
+
+				results.forEach((movie) => {
+					movie.poster_src = 'http://image.tmdb.org/t/p/w185' + movie.poster_path;
+					//console.log(movie);
+					const movieRow = <MovieRow key={movie.id} movie={movie} />;
+					movieRows.push(movieRow);
+				});
+
+				this.setState({
+					rows: movieRows
+				});
 			},
-			{
-				id: 1,
-				title: 'The Avengers',
-				poster_src: 'https://image.tmdb.org/t/p/w185_and_h278_bestv2/cezWGskPY5x7GaglTTRN4Fugfb8.jpg',
-				overview:
-					'When an unexpected enemy emerges and threatens global safety and security, Nick Fury, director of the international peacekeeping agency known as S.H.I.E.L.D.'
+			error: (xhr, status, err) => {
+				console.error('Failed to fetch data');
 			}
-		];
-		var movieRows = [];
-		movies.forEach((movie) => {
-			const movieRow = <MovieRow movie={movie} />;
-
-			movieRows.push(movieRow);
 		});
+	}
 
-		this.state = {
-			rows: movieRows
-		};
+	searchChangeHandler(event) {
+		const boundObject = this;
+		const serchTerm = event.target.value;
+		boundObject.performSearch(serchTerm);
 	}
 
 	render() {
@@ -52,7 +63,12 @@ class App extends Component {
 					</tbody>
 				</table>
 
-				<input type="text" placeholder="Search..." className="search" />
+				<input
+					type="text"
+					placeholder="Search..."
+					className="search"
+					onChange={this.searchChangeHandler.bind(this)}
+				/>
 
 				{this.state.rows}
 			</div>
