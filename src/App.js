@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import $ from 'jquery';
+import axios from 'axios';
 
 import './App.css';
 import MovieRow from './MovieRow';
@@ -16,12 +16,10 @@ class App extends Component {
 	performSearch(searchTerm) {
 		const urlString =
 			'https://api.themoviedb.org/3/search/movie?api_key=65f79409283878f174a96aea0dc77a36&query=' + searchTerm;
-		$.ajax({
-			url: urlString,
-			success: (searchResults) => {
-				//console.log('Fetched Data Successfully');
-				const results = searchResults.results;
-				const movieRows = [];
+		axios.get(urlString).then(res => {
+			//console.log(res.data.results)
+			const results = res.data.results
+			const movieRows = [];
 
 				results.forEach((movie) => {
 					movie.poster_src = 'http://image.tmdb.org/t/p/w185' + movie.poster_path;
@@ -33,11 +31,7 @@ class App extends Component {
 				this.setState({
 					rows: movieRows
 				});
-			},
-			error: (xhr, status, err) => {
-				console.error('Failed to fetch data');
-			}
-		});
+		})
 	}
 
 	searchChangeHandler(event) {
